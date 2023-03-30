@@ -2,6 +2,42 @@
 
 echo "This script will add games to your Sunshine application based on your application menu."
 
+# Check if jd is installed
+if ! [ -x "$(command -v jd)" ]; then
+    read -p "jd is not installed. Would you like to install it? (y/n) " answer
+    case ${answer:0:1} in
+        y|Y )
+            # Detect the type of distro and install the package for it
+            if [ -f /etc/os-release ]; then
+                . /etc/os-release
+                case $ID in
+                    ubuntu|debian )
+                        apt-get install jd
+                        ;;
+                    centos|fedora )
+                        yum install jd
+                        ;;
+                    * )
+                        echo "Distribution not supported"
+                        exit 1
+                        ;;
+                esac
+            else
+                echo "Distribution not supported"
+                exit 1
+            fi
+            ;;
+        n|N )
+            echo "This script will not work without jd. Exiting..."
+            exit 1
+            ;;
+        * )
+            echo "Invalid input. Exiting..."
+            exit 1
+            ;;
+    esac
+fi
+
 # Create a temporary file to store the list of game applications
 tmpfile=$(mktemp)
 
@@ -74,4 +110,4 @@ done < "$tmpfile"
 
 # Remove the temporary file and directory
 rm "$tmpfile"
-rm -r "$tmpdir"
+rm -r "$tmpdir
